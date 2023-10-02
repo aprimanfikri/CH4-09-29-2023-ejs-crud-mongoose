@@ -16,7 +16,21 @@ const createTour = async (req, res) => {
 
 const getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find()
+    const { price, name } = req.query
+    const condition = {}
+    if (price) {
+      condition.price = { $gt: req.query.price }
+    }
+    if (name) {
+      condition.name = {
+        $regex: ".*" + name + ".*",
+        $options: "i",
+      }
+    }
+    console.log(condition)
+    const tours = await Tour.find().where(
+      condition
+    )
     res.render("tours/index", { tours })
   } catch (err) {
     res.status(400).json({
